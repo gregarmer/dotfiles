@@ -91,7 +91,7 @@ print_result() {
 }
 
 print_success() {
-  printf "\e[0;32m  [✔] $1\e[0m\n"
+  printf "\\e[0;32m  [✔] %s\\e[0m\\n" "$1"
 }
 
 while true; do
@@ -103,7 +103,7 @@ while true; do
   esac
 done
 
-SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" || exit 1; pwd -P)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 DOTFILES_BACKUP=~/dotfiles-backup-$(date +"%Y-%m-%d-%H:%M:%S")
 
@@ -149,7 +149,7 @@ main() {
   print_info "Symlinking new files into place ... "
   for i in "${FILES_TO_SYMLINK[@]}"; do
     sourceFile="$(pwd)/$i"
-    targetFile="$HOME/.$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
+    targetFile="$HOME/.$(printf "%s" "$i" | sed "s/.*\\/\\(.*\\)/\\1/g")"
 
     if [ ! -e "$targetFile" ]; then
       execute "ln -fs $sourceFile $targetFile" "$targetFile → $sourceFile"
