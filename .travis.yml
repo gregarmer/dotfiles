@@ -1,0 +1,5 @@
+sudo: required
+services:
+  - docker
+script:
+  - docker run --rm --name shellcheck -v $(CURDIR):/mnt:ro --workdir /mnt koalaman/shellcheck:latest ./test.sh
