@@ -1,0 +1,30 @@
+source dotfiles/zsh/antigen.zsh
+
+# Load the oh-my-zsh's library.
+antigen use oh-my-zsh
+
+# Bundles from the default repo (robbyrussell's oh-my-zsh).
+antigen bundle git
+antigen bundle golang
+antigen bundle history-substring-search
+antigen bundle postgres
+antigen bundle python
+antigen bundle systemd
+antigen bundle heroku
+antigen bundle pip
+antigen bundle lein
+antigen bundle command-not-found
+
+# Syntax highlighting bundle.
+antigen bundle zsh-users/zsh-syntax-highlighting
+
+# Load the theme.
+antigen theme sorin
+
+# Tell Antigen that you're done.
+antigen apply
+
+export PROMPT='%{$fg[magenta]%}%m %{$fg[cyan]%}%c$(git_prompt_info) %(!.{$fg_bold[red]%}#.%{$fg_bold[green]%}❯)%{$reset_color%} '
+export LANG=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+
