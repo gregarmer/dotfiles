@@ -1,5 +1,9 @@
-sudo: required
-services:
-  - docker
+sudo: false
+addons:
+  apt:
+    sources:
+    - debian-sid    # Grab ShellCheck from the Debian repo
+    packages:
+    - shellcheck
 script:
-  - docker run --rm --name shellcheck -v $(pwd):/mnt:ro --workdir /mnt koalaman/shellcheck:latest ./test.sh
+  - ./test.sh
