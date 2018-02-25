@@ -24,5 +24,3 @@ USER greg
 
 ADD . /home/greg/dotfiles
 RUN /home/greg/dotfiles/setup.sh -y
-
-WORKDIR /home/greg
