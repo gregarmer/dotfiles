@@ -129,13 +129,37 @@ echo "done"
 # Actual symlink stuff
 #
 
+# Atom editor settings
+#echo -n "Copying Atom settings.."
+#mv -f ~/.atom ~/dotfiles_old/
+#ln -s $HOME/dotfiles/atom ~/.atom
+#echo "done"
+
 declare -a FILES_TO_SYMLINK=(
+  #'shell/shell_aliases'
+  #'shell/shell_config'
+  #'shell/shell_exports'
+  #'shell/shell_functions'
+  #'shell/bash_profile'
+  #'shell/bash_prompt'
+  #'shell/bashrc'
+  #'shell/zshrc'
+  #'shell/ackrc'
+  #'shell/curlrc'
+  #'shell/gemrc'
+  #'shell/inputrc'
+  #'shell/screenrc'
+
   'git/gitattributes'
   'git/gitconfig'
   'git/gitignore'
 
   'zsh/zshrc'
 )
+
+# FILES_TO_SYMLINK="$FILES_TO_SYMLINK .vim bin" # add in vim and the binaries
+
+# Move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks from the homedir to any files in the ~/dotfiles directory specified in $files
 
 print_info "Backing up existing dotfiles ... "
 for i in "${FILES_TO_SYMLINK[@]}"; do
@@ -171,6 +195,76 @@ main() {
   done
 
   unset FILES_TO_SYMLINK
+
+  ## Copy binaries
+  #ln -fs $HOME/dotfiles/bin $HOME
+
+  #declare -a BINARIES=(
+  #  'batcharge.py'
+  #  'crlf'
+  #  'dups'
+  #  'git-delete-merged-branches'
+  #  'nyan'
+  #  'passive'
+  #  'proofread'
+  #  'ssh-key'
+  #  'weasel'
+  #)
+
+  #for i in ${BINARIES[@]}; do
+  #  echo "Changing access permissions for binary script :: ${i##*/}"
+  #  chmod +rwx $HOME/bin/${i##*/}
+  #done
+
+  #unset BINARIES
+
+  ## Symlink online-check.sh
+  #ln -fs $HOME/dotfiles/lib/online-check.sh $HOME/online-check.sh
+
+  ## Write out current crontab
+  #crontab -l > mycron
+  ## Echo new cron into cron file
+  #echo "* * * * * ~/online-check.sh" >> mycron
+  ## Install new cron file
+  #crontab mycron
+  #rm mycron
+}
+
+install_zsh () {
+  print_info "Checking if we need to install zsh ..."
+
+  # Test to see if zshell is installed.  If it is:
+  if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ]; then
+    print_success "zsh is already installed"
+
+    # Set the default shell to zsh if it isn't currently set to zsh
+    if [ "$(getent passwd "$USER" | awk -F: '{print $NF}')" == "$(which zsh)" ]; then
+      print_success "Shell is already set to zsh"
+    else
+      print_error "Your defualt shell is not zsh, please run this: chsh -s $(which zsh)"
+    fi
+  else
+    # If zsh isn't installed, get the platform of the current machine
+    platform=$(uname);
+    # If the platform is Linux, try an apt-get to install zsh and then recurse
+    if [[ $platform == 'Linux' ]]; then
+      if [[ -f /etc/redhat-release ]]; then
+        sudo yum install zsh
+        install_zsh
+      elif [[ -f /etc/debian_version ]]; then
+        sudo apt-get install zsh
+        install_zsh
+      elif [ -f /etc/arch-release ]; then
+        sudo pacman -Sy zsh
+	install_zsh
+      fi
+    # If the platform is OS X, tell the user to install zsh :)
+    elif [[ $platform == 'Darwin' ]]; then
+      echo "We'll install zsh, then re-run this script!"
+      brew install zsh
+      exit
+    fi
+  fi
 }
 
 install_zsh () {
