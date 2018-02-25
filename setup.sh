@@ -43,7 +43,7 @@ get_answer() {
 }
 
 get_os() {
-  declare -r OS_NAME="$(uname -s)"
+  local -r OS_NAME="$(uname -s)"
   local os=""
 
   if [ "$OS_NAME" == "Darwin" ]; then
@@ -56,7 +56,7 @@ get_os() {
 }
 
 is_git_repository() {
-  [ "$(git rev-parse &>/dev/null; printf $?)" -eq 0 ] && return 0 || return 1
+  [ "$(git rev-parse &>/dev/null; print $?)" -eq 0 ] && return 0 || return 1
 }
 
 mkd() {
@@ -86,7 +86,11 @@ print_question() {
 }
 
 print_result() {
-  [ "$1" -eq 0 ] && print_success "$2" || print_error "$2"
+  if [ "$1" -eq 0 ]; then
+    print_success "$2"
+  else
+    print_error "$2"
+  fi
   [ "$3" == "true" ] && [ "$1" -ne 0 ] && exit
 }
 
@@ -118,7 +122,7 @@ echo "done"
 
 # Change to the dotfiles directory
 echo -n "Changing to the $DOTFILES_DIR directory ... "
-cd "$DOTFILES_DIR"
+cd "$DOTFILES_DIR" || exit 1
 echo "done"
 
 #
