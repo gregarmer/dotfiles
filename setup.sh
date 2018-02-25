@@ -43,7 +43,7 @@ get_answer() {
 }
 
 get_os() {
-  declare -r OS_NAME="$(uname -s)"
+  local -r OS_NAME="$(uname -s)"
   local os=""
 
   if [ "$OS_NAME" == "Darwin" ]; then
@@ -56,7 +56,7 @@ get_os() {
 }
 
 is_git_repository() {
-  [ "$(git rev-parse &>/dev/null; printf $?)" -eq 0 ] && return 0 || return 1
+  [ "$(git rev-parse &>/dev/null; print $?)" -eq 0 ] && return 0 || return 1
 }
 
 mkd() {
@@ -86,12 +86,16 @@ print_question() {
 }
 
 print_result() {
-  [ "$1" -eq 0 ] && print_success "$2" || print_error "$2"
+  if [ "$1" -eq 0 ]; then
+    print_success "$2"
+  else
+    print_error "$2"
+  fi
   [ "$3" == "true" ] && [ "$1" -ne 0 ] && exit
 }
 
 print_success() {
-  printf "\e[0;32m  [✔] $1\e[0m\n"
+  printf "\\e[0;32m  [✔] %s\\e[0m\\n" "$1"
 }
 
 while true; do
@@ -103,7 +107,7 @@ while true; do
   esac
 done
 
-SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" || exit 1; pwd -P)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
 DOTFILES_BACKUP=~/dotfiles-backup-$(date +"%Y-%m-%d-%H:%M:%S")
 
@@ -118,20 +122,34 @@ echo "done"
 
 # Change to the dotfiles directory
 echo -n "Changing to the $DOTFILES_DIR directory ... "
-cd "$DOTFILES_DIR"
+cd "$DOTFILES_DIR" || exit 1
 echo "done"
 
-#
-# Actual symlink stuff
-#
-
 declare -a FILES_TO_SYMLINK=(
+  #'shell/shell_aliases'
+  #'shell/shell_config'
+  #'shell/shell_exports'
+  #'shell/shell_functions'
+  #'shell/bash_profile'
+  #'shell/bash_prompt'
+  #'shell/bashrc'
+  #'shell/zshrc'
+  #'shell/ackrc'
+  #'shell/curlrc'
+  #'shell/gemrc'
+  #'shell/inputrc'
+  #'shell/screenrc'
+
   'git/gitattributes'
   'git/gitconfig'
   'git/gitignore'
 
   'zsh/zshrc'
 )
+
+# FILES_TO_SYMLINK="$FILES_TO_SYMLINK .vim bin" # add in vim and the binaries
+
+# Move any existing dotfiles in homedir to dotfiles_old directory, then create symlinks from the homedir to any files in the ~/dotfiles directory specified in $files
 
 print_info "Backing up existing dotfiles ... "
 for i in "${FILES_TO_SYMLINK[@]}"; do
@@ -149,7 +167,7 @@ main() {
   print_info "Symlinking new files into place ... "
   for i in "${FILES_TO_SYMLINK[@]}"; do
     sourceFile="$(pwd)/$i"
-    targetFile="$HOME/.$(printf "%s" "$i" | sed "s/.*\/\(.*\)/\1/g")"
+    targetFile="$HOME/.$(printf "%s" "$i" | sed "s/.*\\/\\(.*\\)/\\1/g")"
 
     if [ ! -e "$targetFile" ]; then
       execute "ln -fs $sourceFile $targetFile" "$targetFile → $sourceFile"
@@ -167,9 +185,158 @@ main() {
   done
 
   unset FILES_TO_SYMLINK
+
+  ## Copy binaries
+  #ln -fs $HOME/dotfiles/bin $HOME
+
+  #declare -a BINARIES=(
+  #  'batcharge.py'
+  #  'crlf'
+  #  'dups'
+  #  'git-delete-merged-branches'
+  #  'nyan'
+  #  'passive'
+  #  'proofread'
+  #  'ssh-key'
+  #  'weasel'
+  #)
+
+  #for i in ${BINARIES[@]}; do
+  #  echo "Changing access permissions for binary script :: ${i##*/}"
+  #  chmod +rwx $HOME/bin/${i##*/}
+  #done
+
+  #unset BINARIES
+
+  ## Symlink online-check.sh
+  #ln -fs $HOME/dotfiles/lib/online-check.sh $HOME/online-check.sh
+
+  ## Write out current crontab
+  #crontab -l > mycron
+  ## Echo new cron into cron file
+  #echo "* * * * * ~/online-check.sh" >> mycron
+  ## Install new cron file
+  #crontab mycron
+  #rm mycron
+}
+
+install_zsh () {
+  print_info "Checking if we need to install zsh ..."
+
+  # Test to see if zshell is installed.  If it is:
+  if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ]; then
+    print_success "zsh is already installed"
+
+    # Set the default shell to zsh if it isn't currently set to zsh
+    if [ "$(getent passwd "$USER" | awk -F: '{print $NF}')" == "$(which zsh)" ]; then
+      print_success "Shell is already set to zsh"
+    else
+      print_error "Your defualt shell is not zsh, please run this: chsh -s $(which zsh)"
+    fi
+  else
+    # If zsh isn't installed, get the platform of the current machine
+    platform=$(uname);
+    # If the platform is Linux, try an apt-get to install zsh and then recurse
+    if [[ $platform == 'Linux' ]]; then
+      if [[ -f /etc/redhat-release ]]; then
+        sudo yum install zsh
+        install_zsh
+      elif [[ -f /etc/debian_version ]]; then
+        sudo apt-get install zsh
+        install_zsh
+      elif [ -f /etc/arch-release ]; then
+        sudo pacman -Sy zsh
+	install_zsh
+      fi
+    # If the platform is OS X, tell the user to install zsh :)
+    elif [[ $platform == 'Darwin' ]]; then
+      echo "We'll install zsh, then re-run this script!"
+      brew install zsh
+      exit
+    fi
+  fi
+}
+
+install_zsh () {
+  print_info "Checking if we need to install zsh ..."
+
+  # Test to see if zshell is installed.  If it is:
+  if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ]; then
+    print_success "zsh is already installed"
+
+    # Set the default shell to zsh if it isn't currently set to zsh
+    if [ "$(getent passwd "$USER" | awk -F: '{print $NF}')" == "$(which zsh)" ]; then
+      print_success "Shell is already set to zsh"
+    else
+      print_error "Your defualt shell is not zsh, please run this: chsh -s $(which zsh)"
+    fi
+  else
+    # If zsh isn't installed, get the platform of the current machine
+    platform=$(uname);
+    # If the platform is Linux, try an apt-get to install zsh and then recurse
+    if [[ $platform == 'Linux' ]]; then
+      if [[ -f /etc/redhat-release ]]; then
+        sudo yum install zsh
+        install_zsh
+      elif [[ -f /etc/debian_version ]]; then
+        sudo apt-get install zsh
+        install_zsh
+      elif [ -f /etc/arch-release ]; then
+        sudo pacman -Sy zsh
+	install_zsh
+      fi
+    # If the platform is OS X, tell the user to install zsh :)
+    elif [[ $platform == 'Darwin' ]]; then
+      echo "We'll install zsh, then re-run this script!"
+      brew install zsh
+      exit
+    fi
+  fi
 }
 
 main
+install_zsh
+
+## Copy over Atom configs
+##cp -r atom/packages.list $HOME/.atom
+#
+## Install community packages
+##apm list --installed --bare - get a list of installed packages
+##apm install --packages-file $HOME/.atom/packages.list
+
+# Atom editor settings
+#echo -n "Copying Atom settings.."
+#mv -f ~/.atom ~/dotfiles_old/
+#ln -s $HOME/dotfiles/atom ~/.atom
+#echo "done"
+
+
+# OS Specifics
+platform=$(uname)
+if [ "$platform" == 'Linux' ]; then
+  if [ -f /etc/redhat-release ]; then
+    print_info "Setting up specifics for RedHat/CentOS ..."
+  elif [ -f /etc/debian_version ]; then
+    print_info "Setting up specifics for Debian ..."
+  elif [ -f /etc/arch-release ]; then
+    print_info "Setting up specifics for ArchLinux ..."
+  fi
+elif [ "$platform" == 'Darwin' ]; then
+  print_info "Setting up specifics for OSX ..."
+
+  defaults write com.apple.terminal StringEncodings -array 4
+  print_success "Only use UTF-8 in Terminal.app"
+
+  defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+  print_success "Don’t display the annoying prompt when quitting iTerm"
+
+  # . "$DOTFILES_DIR/install/brew.sh"
+  # . "$DOTFILES_DIR/install/npm.sh"
+
+  # if [ "$(uname)" == "Darwin" ]; then
+      # . "$DOTFILES_DIR/install/brew-cask.sh"
+  # fi
+fi
 
 # Reload zsh settings
 #source ~/.zshrc
