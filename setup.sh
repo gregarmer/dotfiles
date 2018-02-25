@@ -173,7 +173,79 @@ main() {
   unset FILES_TO_SYMLINK
 }
 
+install_zsh () {
+  print_info "Checking if we need to install zsh ..."
+
+  # Test to see if zshell is installed.  If it is:
+  if [ -f /bin/zsh ] || [ -f /usr/bin/zsh ]; then
+    print_success "zsh is already installed"
+
+    # Set the default shell to zsh if it isn't currently set to zsh
+    if [ "$(getent passwd "$USER" | awk -F: '{print $NF}')" == "$(which zsh)" ]; then
+      print_success "Shell is already set to zsh"
+    else
+      print_error "Your defualt shell is not zsh, please run this: chsh -s $(which zsh)"
+    fi
+  else
+    # If zsh isn't installed, get the platform of the current machine
+    platform=$(uname);
+    # If the platform is Linux, try an apt-get to install zsh and then recurse
+    if [[ $platform == 'Linux' ]]; then
+      if [[ -f /etc/redhat-release ]]; then
+        sudo yum install zsh
+        install_zsh
+      elif [[ -f /etc/debian_version ]]; then
+        sudo apt-get install zsh
+        install_zsh
+      elif [ -f /etc/arch-release ]; then
+        sudo pacman -Sy zsh
+	install_zsh
+      fi
+    # If the platform is OS X, tell the user to install zsh :)
+    elif [[ $platform == 'Darwin' ]]; then
+      echo "We'll install zsh, then re-run this script!"
+      brew install zsh
+      exit
+    fi
+  fi
+}
+
 main
+install_zsh
+
+## Copy over Atom configs
+##cp -r atom/packages.list $HOME/.atom
+#
+## Install community packages
+##apm list --installed --bare - get a list of installed packages
+##apm install --packages-file $HOME/.atom/packages.list
+
+# OS Specifics
+platform=$(uname)
+if [ "$platform" == 'Linux' ]; then
+  if [ -f /etc/redhat-release ]; then
+    print_info "Setting up specifics for RedHat/CentOS ..."
+  elif [ -f /etc/debian_version ]; then
+    print_info "Setting up specifics for Debian ..."
+  elif [ -f /etc/arch-release ]; then
+    print_info "Setting up specifics for ArchLinux ..."
+  fi
+elif [ "$platform" == 'Darwin' ]; then
+  print_info "Setting up specifics for OSX ..."
+
+  defaults write com.apple.terminal StringEncodings -array 4
+  print_success "Only use UTF-8 in Terminal.app"
+
+  defaults write com.googlecode.iterm2 PromptOnQuit -bool false
+  print_success "Don’t display the annoying prompt when quitting iTerm"
+
+  # . "$DOTFILES_DIR/install/brew.sh"
+  # . "$DOTFILES_DIR/install/npm.sh"
+
+  # if [ "$(uname)" == "Darwin" ]; then
+      # . "$DOTFILES_DIR/install/brew-cask.sh"
+  # fi
+fi
 
 # Reload zsh settings
 #source ~/.zshrc
