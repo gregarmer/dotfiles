@@ -1,3 +1,6 @@
+.PHONY: all
+all: help
+
 .PHONY: build-dev-arch
 build-dev-arch: ## Build a new dev-arch docker image
 	docker build -t gregarmer/dotfiles-arch:latest -f Dockerfile.arch .
