@@ -125,16 +125,6 @@ echo -n "Changing to the $DOTFILES_DIR directory ... "
 cd "$DOTFILES_DIR" || exit 1
 echo "done"
 
-#
-# Actual symlink stuff
-#
-
-# Atom editor settings
-#echo -n "Copying Atom settings.."
-#mv -f ~/.atom ~/dotfiles_old/
-#ln -s $HOME/dotfiles/atom ~/.atom
-#echo "done"
-
 declare -a FILES_TO_SYMLINK=(
   #'shell/shell_aliases'
   #'shell/shell_config'
@@ -313,6 +303,13 @@ install_zsh
 ## Install community packages
 ##apm list --installed --bare - get a list of installed packages
 ##apm install --packages-file $HOME/.atom/packages.list
+
+# Atom editor settings
+#echo -n "Copying Atom settings.."
+#mv -f ~/.atom ~/dotfiles_old/
+#ln -s $HOME/dotfiles/atom ~/.atom
+#echo "done"
+
 
 # OS Specifics
 platform=$(uname)
