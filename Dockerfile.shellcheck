@@ -1,0 +1,8 @@
+FROM base/archlinux
+
+MAINTAINER Gregory Armer <greg@sigterm.sh>
+
+RUN pacman --noconfirm -Syu
+RUN pacman --noconfirm -S shellcheck
+
+WORKDIR /dotfiles

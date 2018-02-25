@@ -1,8 +1,12 @@
 .PHONY: all
 all: help
 
+.PHONY: build-shellcheck
+build-shellcheck: ## Builds a new shellcheck docker image to run tests in
+	docker build -t gregarmer/dotfiles-shellcheck:latest -f Dockerfile.shellcheck .
+
 .PHONY: build-dev-arch
-build-dev-arch: ## Build a new dev-arch docker image
+build-dev-arch: ## Builds a new dev-arch docker image
 	docker build -t gregarmer/dotfiles-arch:latest -f Dockerfile.arch .
 
 .PHONY: dev-arch
@@ -14,7 +18,7 @@ test: shellcheck ## Runs all the tests on the files in the repository.
 
 .PHONY: shellcheck
 shellcheck: ## Runs the shellcheck tests on the scripts.
-	./test.sh
+	docker run -it --rm -v $(CURDIR):/dotfiles:ro gregarmer/dotfiles-shellcheck:latest ./test.sh
 
 .PHONY: help
 help:
