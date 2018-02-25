@@ -1,0 +1,26 @@
+FROM base/archlinux
+
+MAINTAINER Gregory Armer <greg@sigterm.sh>
+
+ENV USER root
+ENV PATH /usr/bin:$PATH
+
+RUN echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen && locale-gen
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
+RUN pacman --noconfirm -Syu
+RUN pacman --noconfirm -S zsh sudo shellcheck git vim
+RUN chsh -s /usr/bin/zsh
+
+RUN useradd -m greg
+WORKDIR /home/greg
+ENV HOME /home/greg
+RUN chown -R greg:greg $HOME
+USER greg
+
+ADD . /home/greg/dotfiles
+RUN /home/greg/dotfiles/setup.sh -y
+
+WORKDIR /home/greg

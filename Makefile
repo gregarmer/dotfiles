@@ -1,3 +1,11 @@
+.PHONY: build-dev-arch
+build-dev-arch: ## Build a new dev-arch docker image
+	docker build -t gregarmer/dotfiles-arch:latest -f Dockerfile.arch .
+
+.PHONY: dev-arch
+dev-arch: ## Runs a basic ArchLinux environment in docker to develop with
+	docker run -it --rm -v $(pwd):/root/dotfiles gregarmer/dotfiles-arch:latest zsh
+
 .PHONY: test
 test: shellcheck ## Runs all the tests on the files in the repository.
 
