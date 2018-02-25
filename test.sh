@@ -6,7 +6,7 @@ ERRORS=()
 
 # find all executables and run `shellcheck`
 for f in $(find . -type f -not -iwholename '*.git*' -not -name "yubitouch.sh" | sort -u); do
-  if file "$f" | grep --quiet shell; then
+  if file "$f" | awk -F: '{print $NF}' | grep --quiet shell; then
     {
       shellcheck "$f" && echo "[OK]: sucessfully linted $f"
     } || {

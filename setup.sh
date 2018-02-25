@@ -98,14 +98,16 @@ print_success() {
   printf "\\e[0;32m  [✔] %s\\e[0m\\n" "$1"
 }
 
-while true; do
-  read -r -p "Warning: this will overwrite your current dotfiles. Continue? [y/n] " yn
-  case $yn in
-    [Yy]* ) break;;
-    [Nn]* ) exit;;
-    * ) echo "Please answer yes or no.";;
-  esac
-done
+if [ "$1" != "-y" ]; then
+  while true; do
+    read -r -p "Warning: this will overwrite your current dotfiles. Continue? [y/n] " yn
+    case $yn in
+      [Yy]* ) break;;
+      [Nn]* ) exit;;
+      * ) echo "Please answer yes or no.";;
+    esac
+  done
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" || exit 1; pwd -P)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
