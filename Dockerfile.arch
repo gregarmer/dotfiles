@@ -12,12 +12,14 @@ ENV LC_ALL en_US.UTF-8
 
 RUN pacman --noconfirm -Syu
 RUN pacman --noconfirm -S zsh sudo shellcheck git vim
-RUN chsh -s /usr/bin/zsh
 
 RUN useradd -m greg
+RUN chown -R greg:greg $HOME
+RUN echo "ALL ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN chsh -s /usr/bin/zsh greg
 WORKDIR /home/greg
 ENV HOME /home/greg
-RUN chown -R greg:greg $HOME
+ENV USER greg
 USER greg
 
 ADD . /home/greg/dotfiles
