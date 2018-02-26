@@ -55,9 +55,6 @@
 [submodule "vim/vim/bundle/vim-bbye"]
 	path = vim/vim/bundle/vim-bbye
 	url = https://github.com/moll/vim-bbye.git
-[submodule "vim/vim/bundle/vim-sayonara"]
-	path = vim/vim/bundle/vim-sayonara
-	url = https://github.com/mhinz/vim-sayonara.git
 [submodule "vim/vim/bundle/vim-gitgutter"]
 	path = vim/vim/bundle/vim-gitgutter
 	url = https://github.com/airblade/vim-gitgutter.git
