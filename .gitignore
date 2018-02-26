@@ -1,0 +1,4 @@
+.DS_Store
+*-rplugin~
+*.swp
+vim/vim/bundle/*/doc/tags

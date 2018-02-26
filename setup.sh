@@ -146,6 +146,9 @@ declare -a FILES_TO_SYMLINK=(
   'git/gitconfig'
   'git/gitignore'
 
+  'vim/vim'
+  'vim/vimrc'
+
   'zsh/zshrc'
 )
 
