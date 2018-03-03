@@ -11,7 +11,7 @@ build-dev-arch: ## Builds a new dev-arch docker image
 
 .PHONY: dev-arch
 dev-arch: ## Runs a basic ArchLinux environment in docker to develop with
-	docker run -it --rm -v $(CURDIR):/home/greg/dotfiles gregarmer/dotfiles-arch:latest zsh
+	docker run -it --rm -v $(CURDIR):/home/greg/dotfiles:cached gregarmer/dotfiles-arch:latest zsh
 
 .PHONY: test
 test: shellcheck ## Runs all the tests on the files in the repository.
