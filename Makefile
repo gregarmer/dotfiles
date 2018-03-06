@@ -20,6 +20,10 @@ test: shellcheck ## Runs all the tests on the files in the repository.
 shellcheck: ## Runs the shellcheck tests on the scripts.
 	docker run -it --rm -v $(CURDIR):/dotfiles:ro gregarmer/dotfiles-shellcheck:latest ./test.sh
 
+.PHONY: update-submodules
+update-submodules: ## Update the git submodules
+	@git submodule update --init
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
