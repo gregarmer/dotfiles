@@ -29,3 +29,4 @@ export LANG=en_US.UTF-8
 export LC_CTYPE=en_US.UTF-8
 
 alias genpass="gpg --gen-random -a 0 24"
+alias remove-color='sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2})?)?[mGK]//g"'
